@@ -1,7 +1,7 @@
 <%-- 
     Document   : verifyEmailError
     Created on : Dec 21, 2015, 11:18:30 PM
-    Author     : atul
+    Author     : lokesh
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8" %>

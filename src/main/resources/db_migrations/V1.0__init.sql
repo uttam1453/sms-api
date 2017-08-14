@@ -600,6 +600,78 @@ CREATE TABLE IF NOT EXISTS `sms`.`STUDENT_RESULT_DETAIL` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+INSERT INTO `sms`.`ROLE_MST` (`name`, `active_flag`) VALUES ('APP_ADMIN', '1');
+INSERT INTO `sms`.`ROLE_MST` (`name`, `active_flag`) VALUES ('SCHOOL_ADMIN', '1');
+INSERT INTO `sms`.`ROLE_MST` (`name`, `active_flag`) VALUES ('TEACHERS', '1');
+INSERT INTO `sms`.`ROLE_MST` (`name`, `active_flag`) VALUES ('PARENTS', '1');
+INSERT INTO `sms`.`ROLE_MST` (`name`, `active_flag`) VALUES ('STUDENTS', '1');
+
+ALTER TABLE `sms`.`USER_MST` 
+ADD COLUMN `mobile_no` INT(11) NOT NULL AFTER `user_name`,
+ADD COLUMN `email_id` VARCHAR(60) NOT NULL AFTER `mobile_no`;
+
+
+ALTER TABLE `sms`.`STAFF_MST` 
+DROP COLUMN `email_id`,
+DROP COLUMN `mobile_no`;
+
+ALTER TABLE `sms`.`STUDENT_MST` 
+DROP COLUMN `email_id`,
+DROP COLUMN `mobile_no`;
+
+CREATE TABLE `sms`.`PARENTS_MST` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `profession` VARCHAR(45) NOT NULL,
+  `spouse` VARCHAR(45) NOT NULL,
+  `spouse_profession` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `user_id_parent_map_fk_idx` (`user_id` ASC),
+  CONSTRAINT `user_id_parent_map_fk`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `sms`.`USER_MST` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+    ALTER TABLE `sms`.`STUDENT_MST` 
+DROP FOREIGN KEY `user_id_student_fk`;
+ALTER TABLE `sms`.`STUDENT_MST` 
+CHANGE COLUMN `user_id` `parent_id` INT(11) NOT NULL ,
+ADD INDEX `parent_id_student_fk_idx` (`parent_id` ASC),
+DROP INDEX `user_id_student_fk_idx` ;
+ALTER TABLE `sms`.`STUDENT_MST` 
+ADD CONSTRAINT `parent_id_student_fk`
+  FOREIGN KEY (`parent_id`)
+  REFERENCES `sms`.`PARENTS_MST` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `sms`.`CLASS_MST` 
+ADD COLUMN `attendance_system` ENUM('DAYWISE', 'DATEWISE') NOT NULL AFTER `class`;
+
+ALTER TABLE `sms`.`CLASS_MST` 
+CHANGE COLUMN `class` `class` ENUM('LKG', 'UKG', 'CLASS_ONE', 'CLASS_TWO', 'CLASS_THREE', 'CLASS_FOURTH', 'CLASS_FIVE', 'CLASS_SIX', 'CLASS_SEVEN', 'CLASS_EIGHT', 'CLASS_NINE', 'CLASS_TEN', 'CLASS_ELEVEN', 'CLASS_TWELVE') NULL DEFAULT NULL ;
+
+CREATE TABLE sms.`USER_SESSION_DETAILS` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `device_type` varchar(25) DEFAULT NULL,
+  `device_token` varchar(45) DEFAULT NULL,
+  `device_model` varchar(20) DEFAULT NULL,
+  `logged_in_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `logged_out_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `session_id` varchar(100) DEFAULT NULL,
+  `is_logged_in` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `user_id_session_fk_idx` (`user_id`),
+  CONSTRAINT `user_id_session_fk` FOREIGN KEY (`user_id`) REFERENCES `USER_MST` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+ALTER TABLE `sms`.`USER_MST` 
+ADD COLUMN `password_reset_req` TINYINT(1) NOT NULL DEFAULT '1' AFTER `active_flag`;
+	
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -1,7 +1,7 @@
 <%-- 
     Document   : verifyEmail
     Created on : Dec 21, 2015, 9:46:51 PM
-    Author     : atul
+    Author     : lokesh
 --%>
 
 
